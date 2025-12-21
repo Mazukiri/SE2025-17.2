@@ -35,6 +35,7 @@ func main() {
 	defer cancel()
 	defer sh(ctx)
 
+	rabbitMqURI := env.GetString("RABBITMQ_URI", "amqp://guest:guest@rabbitmq:5672/")
 
 	// Setup graceful shutdown
 	go func() {
@@ -58,5 +59,27 @@ func main() {
 		return
 	}
 
+	// Stripe processor
+	paymentProcessor := stripe.NewStripeClient(stripeCfg)
+
+	// Service
+	svc := service.NewPaymentService(paymentProcessor)
+
+	// RabbitMQ connection
+	rabbitmq, err := messaging.NewRabbitMQ(rabbitMqURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rabbitmq.Close()
+
+	log.Println("Starting RabbitMQ connection")
+
+	// Trip Consumer
+	tripConsumer := events.NewTripConsumer(rabbitmq, svc)
+	go tripConsumer.Listen()
+
+	// Wait for shutdown signal
+	<-ctx.Done()
+	log.Println("Shutting down payment service...")
 }
  
