@@ -75,3 +75,34 @@ func (r *mongoRepository) UpdateTrip(ctx context.Context, tripID string, status 
 
 	return nil
 }
+
+func (r *mongoRepository) SaveRideFare(ctx context.Context, fare *domain.RideFareModel) error {
+	result, err := r.db.Collection(db.RideFaresCollection).InsertOne(ctx, fare)
+	if err != nil {
+		return err
+	}
+
+	fare.ID = result.InsertedID.(primitive.ObjectID)
+
+	return nil
+}
+
+func (r *mongoRepository) GetRideFareByID(ctx context.Context, id string) (*domain.RideFareModel, error) {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	result := r.db.Collection(db.RideFaresCollection).FindOne(ctx, bson.M{"_id": _id})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	var fare domain.RideFareModel
+	err = result.Decode(&fare)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fare, nil
+}
