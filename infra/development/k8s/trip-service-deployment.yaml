@@ -46,3 +46,16 @@ spec:
                 configMapKeyRef:
                   key: JAEGER_ENDPOINT
                   name: app-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trip-service
+spec:
+  selector:
+    app: trip-service
+  ports:
+    - port: 9093
+      name: grpc
+      targetPort: 9093
+  type: ClusterIP
