@@ -7,13 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"ride-sharing/services/payment-service/internal/events"
-	"ride-sharing/services/payment-service/internal/infrastructure/stripe"
-	"ride-sharing/services/payment-service/internal/service"
-	"ride-sharing/services/payment-service/pkg/types"
-	"ride-sharing/shared/env"
-	"ride-sharing/shared/messaging"
-	"ride-sharing/shared/tracing"
+	"se2025-17.2/services/payment-service/internal/events"
+	"se2025-17.2/services/payment-service/internal/infrastructure/stripe"
+	"se2025-17.2/services/payment-service/internal/service"
+	"se2025-17.2/services/payment-service/pkg/types"
+	"se2025-17.2/shared/env"
+	"se2025-17.2/shared/messaging"
+	"se2025-17.2/shared/tracing"
 )
 
 var GrpcAddr = env.GetString("GRPC_ADDR", ":9004")
@@ -21,8 +21,8 @@ var GrpcAddr = env.GetString("GRPC_ADDR", ":9004")
 func main() {
 	// Initialize Tracing
 	tracerCfg := tracing.Config{
-		ServiceName: "payment-service",
-		Environment: env.GetString("ENVIRONMENT", "development"),
+		ServiceName:    "payment-service",
+		Environment:    env.GetString("ENVIRONMENT", "development"),
 		JaegerEndpoint: env.GetString("JAEGER_ENDPOINT", "http://jaeger:14368/api/traces"),
 	}
 
@@ -82,4 +82,3 @@ func main() {
 	<-ctx.Done()
 	log.Println("Shutting down payment service...")
 }
- 
